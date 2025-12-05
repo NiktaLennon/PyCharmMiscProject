@@ -1,0 +1,109 @@
+name: PR Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  test-summary:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest-html pytest-json-report
+    
+    - name: Run tests with detailed reporting
+      run: |
+        pytest -v \
+          --html=report.html \
+          --self-contained-html \
+          --json-report \
+          --json-report-file=report.json
+      continue-on-error: true
+    
+    - name: Upload test report
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-report
+        path: |
+          report.html
+          report.json
+    
+    - name: Comment PR with test results
+      if: always() && github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          try {
+            const report = JSON.parse(fs.readFileSync('report.json', 'utf8'));
+            const summary = report.summary;
+            
+            const body = `## 🧪 Test Results
+            
+            - ✅ Passed: ${summary.passed || 0}
+            - ❌ Failed: ${summary.failed || 0}
+            - ⚠️ Skipped: ${summary.skipped || 0}
+            - ⏱️ Total: ${summary.total || 0}
+            - 🕐 Duration: ${(summary.duration || 0).toFixed(2)}s
+            
+            ${summary.failed > 0 ? '❌ **Some tests failed!**' : '✅ **All tests passed!**'}
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+          } catch (error) {
+            console.log('Could not read test report:', error);
+          }
+
+  security-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install safety bandit
+    
+    - name: Check for security vulnerabilities in dependencies
+      run: |
+        safety check --json || true
+      continue-on-error: true
+    
+    - name: Run Bandit security linter
+      run: |
+        bandit -r . -f json -o bandit-report.json || true
+      continue-on-error: true
+    
+    - name: Upload security reports
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-reports
+        path: |
+          bandit-report.json
+
