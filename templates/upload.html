@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}Загрузка файла - Expense Tracker{% endblock %}
+
+{% block extra_styles %}
+.upload-form {
+    margin: 20px 0;
+}
+
+.file-input-wrapper {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.file-input {
+    display: none;
+}
+
+.file-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 40px;
+    border: 3px dashed var(--border);
+    border-radius: 12px;
+    background: var(--background);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    flex-direction: column;
+}
+
+.file-label:hover {
+    border-color: var(--primary);
+    background: rgba(99, 102, 241, 0.05);
+}
+
+.file-label .icon {
+    font-size: 3rem;
+}
+
+.file-name {
+    margin-top: 10px;
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+.alert {
+    padding: 15px 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+    animation: fadeInUp 0.4s ease;
+}
+
+.alert-success {
+    background: #d1fae5;
+    color: #065f46;
+    border-left: 4px solid var(--secondary);
+}
+
+.alert-error {
+    background: #fee2e2;
+    color: #991b1b;
+    border-left: 4px solid var(--danger);
+}
+
+.error-list {
+    margin-top: 10px;
+    padding-left: 20px;
+}
+
+.error-list li {
+    margin: 5px 0;
+}
+
+.info-box {
+    background: #dbeafe;
+    border-left: 4px solid #3b82f6;
+    padding: 15px 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+}
+
+.info-box h4 {
+    color: #1e40af;
+    margin-bottom: 10px;
+}
+
+.info-box code {
+    background: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--text-light);
+    text-decoration: none;
+    margin-bottom: 20px;
+    transition: color 0.3s ease;
+}
+
+.back-link:hover {
+    color: var(--primary);
+}
+{% endblock %}
+
+{% block content %}
+<a href="/" class="back-link">← Вернуться на главную</a>
+
+<div class="card">
+    <div class="card-header">
+        <h2>📤 Загрузка файла расходов</h2>
+    </div>
+    <div class="card-body">
+        <form action="/upload" method="post" enctype="multipart/form-data" class="upload-form">
+            <div class="file-input-wrapper">
+                <input type="file" name="file" id="file" class="file-input" accept=".txt" required>
+                <label for="file" class="file-label">
+                    <div class="icon">📁</div>
+                    <div>
+                        <strong>Нажмите для выбора файла</strong>
+                        <div class="file-name" id="file-name">или перетащите файл сюда</div>
+                    </div>
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                📤 Загрузить и обработать
+            </button>
+        </form>
+
+        {% if inserted is defined %}
+            <div class="alert alert-success">
+                <strong>✅ Успешно!</strong> Добавлено записей: <strong>{{ inserted }}</strong>
+            </div>
+
+            {% if errors %}
+                <div class="alert alert-error">
+                    <strong>⚠️ Внимание!</strong> Обнаружены ошибки при обработке:
+                    <ul class="error-list">
+                    {% for e in errors %}
+                        <li>{{ e }}</li>
+                    {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        {% endif %}
+
+        <div class="info-box">
+            <h4>ℹ️ Формат файла</h4>
+            <p>Файл должен содержать данные в формате:</p>
+            <p><code>дата;категория;сумма;комментарий</code></p>
+            <p style="margin-top: 10px;"><strong>Пример:</strong></p>
+            <p><code>2024-01-15;Продукты;1500.50;Магазин</code></p>
+            <p><code>2024-01-16;Транспорт;250;Такси</code></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const fileInput = document.getElementById('file');
+    const fileName = document.getElementById('file-name');
+    
+    fileInput.addEventListener('change', function(e) {
+        if (e.target.files.length > 0) {
+            fileName.textContent = e.target.files[0].name;
+        } else {
+            fileName.textContent = 'или перетащите файл сюда';
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}Документация - Expense Tracker{% endblock %}
+
+{% block extra_styles %}
+.docs-section {
+    margin: 30px 0;
+}
+
+.docs-section h3 {
+    color: var(--primary);
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+}
+
+.endpoint {
+    background: var(--background);
+    padding: 20px;
+    border-radius: 12px;
+    margin: 15px 0;
+    border-left: 4px solid var(--primary);
+}
+
+.endpoint .method {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-right: 10px;
+}
+
+.method.get {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.method.post {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.endpoint .path {
+    font-family: 'Courier New', monospace;
+    font-size: 1.1rem;
+    color: var(--text);
+}
+
+.endpoint .description {
+    margin-top: 10px;
+    color: var(--text-light);
+    line-height: 1.6;
+}
+
+code {
+    background: var(--background);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    color: var(--primary);
+}
+
+pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    margin: 15px 0;
+}
+
+pre code {
+    background: none;
+    color: inherit;
+    padding: 0;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--text-light);
+    text-decoration: none;
+    margin-bottom: 20px;
+    transition: color 0.3s ease;
+}
+
+.back-link:hover {
+    color: var(--primary);
+}
+{% endblock %}
+
+{% block content %}
+<a href="/" class="back-link">← Вернуться на главную</a>
+
+<div class="card">
+    <div class="card-header">
+        <h2>📚 Документация API</h2>
+    </div>
+    <div class="card-body">
+        <div class="docs-section">
+            <h3>Endpoints</h3>
+            
+            <div class="endpoint">
+                <div>
+                    <span class="method get">GET</span>
+                    <span class="path">/</span>
+                </div>
+                <div class="description">
+                    Главная страница приложения
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div>
+                    <span class="method get">GET</span>
+                    <span class="path">/upload</span>
+                </div>
+                <div class="description">
+                    Страница загрузки файла с расходами
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div>
+                    <span class="method post">POST</span>
+                    <span class="path">/upload</span>
+                </div>
+                <div class="description">
+                    Загрузка и обработка файла с расходами. Файл должен быть в формате: <code>дата;категория;сумма;комментарий</code>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div>
+                    <span class="method get">GET</span>
+                    <span class="path">/report</span>
+                </div>
+                <div class="description">
+                    HTML отчёт со статистикой расходов (по месяцам, категориям и т.д.)
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div>
+                    <span class="method get">GET</span>
+                    <span class="path">/report/pdf</span>
+                </div>
+                <div class="description">
+                    Скачивание PDF отчёта с полной статистикой
+                </div>
+            </div>
+        </div>
+
+        <div class="docs-section">
+            <h3>Формат файла для загрузки</h3>
+            <p>Файл должен содержать строки в следующем формате:</p>
+            <pre><code>дата;категория;сумма;комментарий</code></pre>
+            
+            <p><strong>Пример файла:</strong></p>
+            <pre><code>2024-01-15;Продукты;1500.50;Покупка в супермаркете
+2024-01-16;Транспорт;250;Поездка на такси
+2024-01-17;Развлечения;800;Кино и ужин
+15.02.2024;Здоровье;2500;Аптека</code></pre>
+
+            <p><strong>Форматы дат:</strong></p>
+            <ul style="margin-left: 20px; color: var(--text-light);">
+                <li><code>YYYY-MM-DD</code> - ISO формат (2024-01-15)</li>
+                <li><code>DD.MM.YYYY</code> - российский формат (15.01.2024)</li>
+            </ul>
+        </div>
+
+        <div class="docs-section">
+            <h3>Технологии</h3>
+            <ul style="margin-left: 20px; color: var(--text-light); line-height: 2;">
+                <li><strong>FastAPI</strong> - современный веб-фреймворк</li>
+                <li><strong>SQLAlchemy</strong> - ORM для работы с базой данных</li>
+                <li><strong>SQLite</strong> - легковесная база данных</li>
+                <li><strong>Jinja2</strong> - шаблонизатор для HTML</li>
+                <li><strong>pdfkit</strong> - генерация PDF отчётов</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
